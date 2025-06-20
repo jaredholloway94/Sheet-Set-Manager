@@ -1,5 +1,5 @@
 from pyrevit import revit, forms
-from Autodesk.Revit.DB import ViewSheet, SubTransaction
+from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, ViewSheet, XYZ
 
 
 class TitleBlocksTab(object):
@@ -18,6 +18,7 @@ class TitleBlocksTab(object):
         # Register UI Event Handlers
         self.main.Configure.Click += self.configure_title_block
         self.main.Reconfigure.Click += self.reconfigure_title_block
+        self.main.ReCenterViewports.Click += self.recenter_viewports
         self.main.ConfiguredTitleBlocksListBox.SelectionChanged += self.update_details
 
         # Initialize lists
@@ -259,4 +260,72 @@ class TitleBlocksTab(object):
         self.set_data(title_block, data)
         # don't need to update the lists here, bc it will happen when the main window is respawned
 
+        return None
+
+
+    def recenter_viewports(self, sender, args):
+
+        tb_name = self.main.ConfiguredTitleBlocksListBox.SelectedItem
+        tb = self.main.configured_title_blocks[tb_name]
+        data = self.get_data(tb)
+        new_center = XYZ(data['center_x'], data['center_y'], 0)
+
+        title_blocks = list(filter(
+            lambda x: x.GetTypeId() == tb.Id,
+            FilteredElementCollector(self.main.doc)
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsNotElementType()
+            ))
+
+        sheets = [ self.main.doc.GetElement(tb.OwnerViewId) for tb in title_blocks ]
+        digits = len(str(len(sheets)))
+
+        with revit.Transaction("Sheet Set Manager - Recenter Viewports"):
+
+            for i,sheet in enumerate(sheets):
+                viewport_ids = sheet.GetAllViewports()
+
+                # Skip sheets with no viewports
+                if len(viewport_ids) < 1:
+                    print(
+                        "[ {:0} / {} ] {}:  No viewports found. Skipping.".
+                        format(
+                            str(i+1).zfill(digits),
+                            len(sheets),
+                            sheet.SheetNumber
+                            )
+                        )
+                    continue
+
+                # Skip sheets with multiple viewports
+                elif len(viewport_ids) > 1:
+                    print(
+                        "[ {} / {} ] {}:  Multiple viewports found. Skipping."
+                        .format(
+                            str(i+1).zfill(digits),
+                            len(sheets),
+                            sheet.SheetNumber
+                            )
+                        )
+                    continue
+                
+                # If there's exactly one viewport, re-center it
+                else:
+                    print(
+                        "[ {} / {} ] {}:  One Viewport found. Re-centering..."
+                        .format(
+                            str(i+1).zfill(digits),
+                            len(sheets),
+                            sheet.SheetNumber
+                            ),
+                        end=' '
+                        )
+                    vp = self.main.doc.GetElement(viewport_ids[0])
+                    try:
+                        vp.SetBoxCenter(new_center)
+                        print("Done.")
+                    except Exception as e:
+                        print("Something went wrong. Skipping.")
+                        print(e)
+                        continue
         return None

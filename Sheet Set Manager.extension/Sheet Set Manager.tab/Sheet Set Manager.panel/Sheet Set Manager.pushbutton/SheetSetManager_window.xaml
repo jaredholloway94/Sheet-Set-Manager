@@ -36,6 +36,7 @@
                     <!-- Buttons -->
                     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,2,0,2">
                         <Button Name="Reconfigure" Content="Reconfigure" Margin="0,0,5,0" Width="75" Height="23" />
+                        <Button Name="ReCenterViewports" Content="Re-Center Viewports" Margin="0,0,5,0" Width="150" Height="23" />
                     </StackPanel>
 
                     <!-- Details Pane for Title Blocks -->

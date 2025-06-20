@@ -364,10 +364,10 @@ class SheetGroupsTab(object):
 
                 # Get the first viewport of the sheet
                 vp = self.main.doc.GetElement(sheet.GetAllViewports()[0])
-                # Get the View associated with the Viewport
-                vp_view = self.main.doc.GetElement(vp.ViewId)
                 # Set the Viewport box center to the Title Block center
                 vp.SetBoxCenter(tb_center)
+                # Get the View associated with the Viewport
+                vp_view = self.main.doc.GetElement(vp.ViewId)
                 # Restore annotation visibility
                 vp_view.AreAnnotationCategoriesHidden = False
 

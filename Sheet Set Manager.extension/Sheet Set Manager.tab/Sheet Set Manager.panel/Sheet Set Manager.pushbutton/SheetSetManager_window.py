@@ -54,13 +54,12 @@ class SheetSetManagerWindow(forms.WPFWindow):
                 )
             }
 
-        self.view_template_collector = list(
-            filter(lambda v: v.IsTemplate,
-                FilteredElementCollector(self.doc)
-                    .OfCategory(BuiltInCategory.OST_Views)
-                    .WhereElementIsNotElementType()
-                )
-            )
+        self.view_template_collector = list(filter(
+            lambda v: v.IsTemplate,
+            FilteredElementCollector(self.doc)
+                .OfCategory(BuiltInCategory.OST_Views)
+                .WhereElementIsNotElementType()
+            ))
 
         # sort view templates by ViewType (equivalent to ViewFamily)
         self.view_templates = {}
