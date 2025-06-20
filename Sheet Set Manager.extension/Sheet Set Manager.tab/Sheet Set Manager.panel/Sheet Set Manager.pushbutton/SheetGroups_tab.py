@@ -320,7 +320,8 @@ class SheetGroupsTab(object):
 
                     sheet_counter = (len(sector_scope_boxes) * level_counter) + scope_box_counter + 1
                     total_sheets = (len(levels) * len(sector_scope_boxes))
-
+                    
+                    # variables available to user for naming templates (exposed via safe_eval)
                     context = {
                         'sheet_group_name': name,
                         'level_name': level.Name,
@@ -342,7 +343,15 @@ class SheetGroupsTab(object):
                     new_view.AreAnnotationCategoriesHidden = True
                     created_views.append(new_view)
 
-                    print('Created View: {} [{}/{}]'.format(new_view.Name, sheet_counter, total_sheets))
+                    print(
+                        '[{}] [{}/{}] Created View: {}'
+                        .format(
+                            datetime.now(),
+                            sheet_counter,
+                            total_sheets,
+                            new_view.Name
+                            )
+                        )
 
                     # Create Sheet
                     new_sheet = ViewSheet.Create(self.main.doc, title_block.Id)
@@ -350,12 +359,29 @@ class SheetGroupsTab(object):
                     new_sheet.Name = safe_eval(sheet_name_template_str, context)
                     created_sheets.append(new_sheet)
 
-                    print('Created Sheet: {} [{}/{}]'.format(new_sheet.Name, sheet_counter, total_sheets))
-                    
+                    print(
+                        '[{}] [{}/{}] Created Sheet: {}  -  {}'
+                        .format(
+                            datetime.now(),
+                            sheet_counter,
+                            total_sheets,
+                            new_sheet.SheetNumber,
+                            new_sheet.Name
+                            )
+                        )
+
                     # Create Viewport
                     new_viewport = Viewport.Create(self.main.doc, new_sheet.Id, new_view.Id, tb_center)
 
-                    print('Created Viewport: {} [{}/{}]'.format(new_sheet.Name, sheet_counter, total_sheets))
+                    print(
+                        '[{}] [{}/{}] Created Viewport: {}'
+                        .format(
+                            datetime.now(),
+                            sheet_counter,
+                            total_sheets,
+                            new_view.Name
+                            )
+                        )
 
         # Align Viewports to Title Blocks
         with revit.Transaction('Sheet Set Manager - Align Viewports to Title Blocks'):

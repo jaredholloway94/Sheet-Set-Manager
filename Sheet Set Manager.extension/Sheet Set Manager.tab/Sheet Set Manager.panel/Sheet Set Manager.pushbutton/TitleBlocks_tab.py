@@ -1,6 +1,6 @@
 from pyrevit import revit, forms
 from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory, ViewSheet, XYZ
-
+from datetime import datetime
 
 class TitleBlocksTab(object):
     '''
@@ -288,8 +288,9 @@ class TitleBlocksTab(object):
                 # Skip sheets with no viewports
                 if len(viewport_ids) < 1:
                     print(
-                        "[ {:0} / {} ] {}:  No viewports found. Skipping.".
+                        "[{}] [{}/{}] {}:  No viewports found. Skipping.".
                         format(
+                            datetime.now(),
                             str(i+1).zfill(digits),
                             len(sheets),
                             sheet.SheetNumber
@@ -300,8 +301,9 @@ class TitleBlocksTab(object):
                 # Skip sheets with multiple viewports
                 elif len(viewport_ids) > 1:
                     print(
-                        "[ {} / {} ] {}:  Multiple viewports found. Skipping."
+                        "[{}] [{}/{}] {}:  Multiple viewports found. Skipping."
                         .format(
+                            datetime.now(),
                             str(i+1).zfill(digits),
                             len(sheets),
                             sheet.SheetNumber
@@ -312,8 +314,9 @@ class TitleBlocksTab(object):
                 # If there's exactly one viewport, re-center it
                 else:
                     print(
-                        "[ {} / {} ] {}:  One Viewport found. Re-centering..."
+                        "[{}] [{}/{}] {}:  One Viewport found. Re-centering..."
                         .format(
+                            datetime.now(),
                             str(i+1).zfill(digits),
                             len(sheets),
                             sheet.SheetNumber
